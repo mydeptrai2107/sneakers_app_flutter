@@ -64,7 +64,7 @@ class OrderHistoryScreen extends StatelessWidget {
                       ),
                       Chip(
                         label: Text(
-                          status,
+                          _formatStatus(status),
                           style: const TextStyle(color: Colors.white),
                         ),
                         backgroundColor: statusColor,
@@ -114,6 +114,23 @@ class OrderHistoryScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String _formatStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return 'Chờ xử lý';
+      case 'processing':
+        return 'Đang xử lý';
+      case 'shipped':
+        return 'Đang giao';
+      case 'delivered':
+        return 'Đã giao';
+      case 'cancelled':
+        return 'Đã hủy';
+      default:
+        return status;
+    }
   }
 
   /// Hàm lấy màu sắc tương ứng với trạng thái đơn hàng
