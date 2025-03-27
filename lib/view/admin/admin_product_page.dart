@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce_app/respository/components/app_styles.dart';
 import 'package:ecommerce_app/respository/components/route_names.dart';
 import 'package:ecommerce_app/utils/formatter.dart';
 import 'package:ecommerce_app/view/admin/admin_edit_product_page.dart';
@@ -113,33 +114,10 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 100,
         centerTitle: true,
-        title: Column(
-          children: [
-            Text(
-              "Quản Lý Sản Phẩm",
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 5),
-            Container(
-              height: 40,
-              child: TextField(
-                onChanged: _filterProducts,
-                decoration: InputDecoration(
-                  hintText: "Tìm kiếm sản phẩm...",
-                  prefixIcon: Icon(Icons.search),
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          "Quản Lý Sản Phẩm",
+          style: TextStyle(fontSize: 18),
         ),
         automaticallyImplyLeading: false,
         actions: [
@@ -154,43 +132,70 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           ),
         ],
       ),
-      body: _filteredProducts.isEmpty
-          ? Center(child: Text("Không tìm thấy sản phẩm nào!"))
-          : ListView.builder(
-              itemCount: _filteredProducts.length,
-              itemBuilder: (context, index) {
-                final product = _filteredProducts[index];
-
-                return Card(
-                  margin: EdgeInsets.all(8),
-                  child: ListTile(
-                    leading: Image.network(
-                      product['imagelink'],
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.contain,
-                    ),
-                    title: Text(product['productname']),
-                    subtitle: Text(
-                        "Giá: ${Formatter.formatCurrency(double.parse(product['productprice']).toInt())}"),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () => addOrUpdateProduct(
-                              id: product['id'], product: product),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => confirmDeleteProduct(product['id']),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+      body: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(15),
+            child: TextField(
+              onChanged: _filterProducts,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Color.fromARGB(255, 176, 173, 173),
+                ),
+                hintText: 'Tìm kiếm giày',
+                hintStyle: TextStyling.hinttext,
+                filled: true,
+                fillColor: const Color.fromARGB(255, 234, 231, 231),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+              ),
             ),
+          ),
+          Expanded(
+            child: _filteredProducts.isEmpty
+                ? Center(child: Text("Không tìm thấy sản phẩm nào!"))
+                : ListView.builder(
+                    itemCount: _filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = _filteredProducts[index];
+
+                      return Card(
+                        margin: EdgeInsets.all(8),
+                        child: ListTile(
+                          leading: Image.network(
+                            product['imagelink'],
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.contain,
+                          ),
+                          title: Text(product['productname']),
+                          subtitle: Text(
+                              "Giá: ${Formatter.formatCurrency(double.parse(product['productprice']).toInt())}"),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => addOrUpdateProduct(
+                                    id: product['id'], product: product),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () =>
+                                    confirmDeleteProduct(product['id']),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => addOrUpdateProduct(),
         child: Icon(Icons.add),

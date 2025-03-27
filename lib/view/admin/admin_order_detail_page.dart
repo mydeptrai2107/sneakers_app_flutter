@@ -143,8 +143,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               const SizedBox(height: 20),
 
               // Cập nhật trạng thái đơn hàng
-              const Text("Cập nhật trạng thái",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text(
+                "Cập nhật trạng thái",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
               const SizedBox(height: 10),
               Container(
                 margin: EdgeInsets.only(bottom: 20),
@@ -165,7 +170,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     'cancelled'
                   ].map((status) {
                     return DropdownMenuItem(
-                        value: status, child: Text(status.toUpperCase()));
+                      value: status,
+                      child: Text(
+                        _formatStatus(status),
+                      ),
+                    );
                   }).toList(),
                   onChanged: (newStatus) {
                     if (newStatus != null) {
@@ -179,5 +188,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         ),
       ),
     );
+  }
+
+  String _formatStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return 'Chờ xử lý';
+      case 'processing':
+        return 'Đang xử lý';
+      case 'shipped':
+        return 'Đang giao';
+      case 'delivered':
+        return 'Đã giao';
+      case 'cancelled':
+        return 'Đã hủy';
+      default:
+        return status;
+    }
   }
 }
