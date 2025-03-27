@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:ecommerce_app/respository/components/route_names.dart';
 import 'package:ecommerce_app/utils/formatter.dart';
 import 'package:ecommerce_app/view/admin/admin_edit_product_page.dart';
@@ -16,6 +14,8 @@ class AdminProductScreen extends StatefulWidget {
 class _AdminProductScreenState extends State<AdminProductScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> _filteredProducts = [];
+  String searchQuery = "";
 
   @override
   void initState() {
@@ -30,31 +30,20 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
       products = querySnapshot.docs
           .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
           .toList();
+      _filteredProducts = products;
     });
   }
 
-  Future<String?> uploadImageToCloudinary(String filePath) async {
-    const String cloudName = "dgfmiwien";
-    const String uploadPreset = "sneakers";
-
-    try {
-      File file = File(filePath);
-      FormData formData = FormData.fromMap({
-        "file": await MultipartFile.fromFile(file.path),
-        "upload_preset": uploadPreset,
-      });
-
-      Response response = await Dio().post(
-        "https://api.cloudinary.com/v1_1/$cloudName/image/upload",
-        data: formData,
-        options: Options(headers: {"Content-Type": "multipart/form-data"}),
-      );
-
-      if (response.statusCode == 200 && response.data != null) {
-        return response.data["secure_url"] as String?;
-      }
-    } catch (_) {}
-    return null;
+  void _filterProducts(String query) {
+    setState(() {
+      searchQuery = query;
+      _filteredProducts = products
+          .where((product) => product['productname']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   Future<void> addOrUpdateProduct(
@@ -76,8 +65,6 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     try {
       await firestore.collection('products').doc(id).delete();
       fetchProducts();
-
-      // Hiển thị thông báo thành công
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Xóa sản phẩm thành công!"),
@@ -126,10 +113,33 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 100,
         centerTitle: true,
-        title: Text(
-          "Quản Lý Sản Phẩm",
-          style: TextStyle(fontSize: 18),
+        title: Column(
+          children: [
+            Text(
+              "Quản Lý Sản Phẩm",
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 5),
+            Container(
+              height: 40,
+              child: TextField(
+                onChanged: _filterProducts,
+                decoration: InputDecoration(
+                  hintText: "Tìm kiếm sản phẩm...",
+                  prefixIcon: Icon(Icons.search),
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
         ),
         automaticallyImplyLeading: false,
         actions: [
@@ -144,17 +154,12 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           ),
         ],
       ),
-      body: products.isEmpty
-          ? Center(child: CircularProgressIndicator())
+      body: _filteredProducts.isEmpty
+          ? Center(child: Text("Không tìm thấy sản phẩm nào!"))
           : ListView.builder(
-              itemCount: products.length + 1,
+              itemCount: _filteredProducts.length,
               itemBuilder: (context, index) {
-                if (index == products.length) {
-                  return SizedBox(
-                    height: 70,
-                  );
-                }
-                final product = products[index];
+                final product = _filteredProducts[index];
 
                 return Card(
                   margin: EdgeInsets.all(8),

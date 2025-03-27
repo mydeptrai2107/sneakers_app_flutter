@@ -23,8 +23,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
       setState(() {});
-    } catch (e) {
-      print("Error fetching products: \$e");
+    } catch (_) {
     }
   }
 

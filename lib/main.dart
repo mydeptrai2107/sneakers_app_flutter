@@ -1,6 +1,6 @@
 import 'package:ecommerce_app/firebase_options.dart';
 import 'package:ecommerce_app/model/product_list.dart';
-import 'package:ecommerce_app/model/userModel.dart';
+import 'package:ecommerce_app/model/user_model.dart';
 import 'package:ecommerce_app/respository/components/route_names.dart';
 import 'package:ecommerce_app/respository/components/routes.dart';
 import 'package:ecommerce_app/utils/fav_provider.dart';
